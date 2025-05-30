@@ -4,6 +4,8 @@ Chattery is a modern, full-stack chat application I built using React, Vite, Tai
 
 ### Live Demo: [https://chattery.pages.dev/](https://chattery.pages.dev/)
 
+> **Demo Login:** > _Email_ `demo@no.mail` > _Password_ `demo`
+
 ## What I Learned
 
 - **Supabase Auth**: I implemented user authentication with Google, Facebook, and email, gaining hands-on experience with Supabase Auth and its integration with Postgres.
@@ -53,7 +55,7 @@ Supabase provides instant RESTful and real-time APIs for these tables, which I u
 
 1. **Clone the repo**
    ```sh
-   git clone https://github.com/yourusername/chattery.git
+   git clone https://github.com/jakariyaa/chattery.git
    cd chattery
    ```
 2. **Install dependencies**
