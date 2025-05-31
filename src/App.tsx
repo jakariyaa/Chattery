@@ -18,9 +18,11 @@ export interface Profile {
 
 const App: React.FC = () => {
   const [session, setSession] = React.useState<Session | null>(null);
-  const [profileFlag, setProfileFlag] = React.useState(false);
   const [profile, setProfile] = React.useState<Profile | null>(null);
+  const [profileLoaded, setProfileLoaded] = React.useState(false);
   const [editProfile, setEditProfile] = React.useState(false);
+
+  const lastProfileUserId = React.useRef<string | null>(null);
 
   React.useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -29,8 +31,13 @@ const App: React.FC = () => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession((prevSession) => {
+        if (prevSession?.user.id !== newSession?.user.id) {
+          setProfileLoaded(false);
+        }
+        return newSession;
+      });
     });
 
     return () => {
@@ -40,7 +47,7 @@ const App: React.FC = () => {
 
   React.useEffect(() => {
     const fetchProfile = async () => {
-      if (session) {
+      if (session && session.user.id !== lastProfileUserId.current) {
         const { data, error } = await supabase
           .from("profiles")
           .select("*")
@@ -48,14 +55,17 @@ const App: React.FC = () => {
           .single();
         if (!error && data) {
           setProfile(data as Profile);
+        } else {
+          setProfile(null);
         }
-        setProfileFlag(true);
+        lastProfileUserId.current = session.user.id;
+        setProfileLoaded(true);
       }
     };
-    if (session) {
+    if (session && !profileLoaded) {
       fetchProfile();
     }
-  }, [session, profileFlag]);
+  }, [session, profileLoaded]);
 
   if (!session) {
     return (
@@ -67,41 +77,45 @@ const App: React.FC = () => {
             variables: {
               default: {
                 colors: {
-                  brand: "red",
-                  brandAccent: "darkred",
+                  brand: "blue",
+                  brandAccent: "darkblue",
                 },
               },
             },
           }}
-          providers={["google", "facebook"]}
+          providers={["google"]}
         />
       </div>
     );
   }
 
-  if (!profileFlag && session) {
-    return (
-      <main className="h-[88vh] md:h-[91.8vh]  flex-1 flex flex-col justify-between relative">
-        <div className="flex items-center justify-center flex-1 flex-col space-y-6">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-700"></div>
-          <p className="text-gray-600 text-center">Loading...</p>
-        </div>
-      </main>
-    );
-  }
+  // if (session && !profileLoaded) {
+  //   return (
+  //     <main className="h-[88vh] md:h-[91.8vh]  flex-1 flex flex-col justify-between relative">
+  //       <div className="flex items-center justify-center flex-1 flex-col space-y-6">
+  //         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-700"></div>
+  //         <p className="text-gray-600 text-center">Loading...</p>
+  //       </div>
+  //     </main>
+  //   );
+  // }
 
   if (session.user.email === undefined || session.user.email === null) {
     session.user.email = "anonymous@no-mail";
   }
 
-  if (session && profileFlag && (!profile || editProfile)) {
+  if (session && profileLoaded && (!profile || editProfile)) {
     return (
       <SetupProfile
         userId={session.user.id}
         email={session.user.email}
         profile={profile}
-        onComplete={() => (setProfileFlag(false), setEditProfile(false))}
-        onCancel={() => (setProfileFlag(false), setEditProfile(false))}
+        onComplete={(updatedProfile) => {
+          setProfile(updatedProfile);
+          setProfileLoaded(true);
+          setEditProfile(false);
+        }}
+        onCancel={() => setEditProfile(false)}
       />
     );
   }
@@ -115,7 +129,7 @@ const App: React.FC = () => {
           setSession(null);
         }}
         profile={profile}
-        editProfile={() => (setProfileFlag(true), setEditProfile(true))}
+        editProfile={() => setEditProfile(true)}
       />
       <div className="flex flex-1">
         <Sidebar />

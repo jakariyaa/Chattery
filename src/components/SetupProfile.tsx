@@ -6,7 +6,7 @@ interface SetupProfileProps {
   userId: string;
   email: string;
   profile: Profile | null;
-  onComplete: () => void;
+  onComplete: (updatedProfile: Profile) => void;
   onCancel: () => void;
 }
 
@@ -41,7 +41,13 @@ export const SetupProfile: React.FC<SetupProfileProps> = ({
     if (error) {
       setError(error.message);
     } else {
-      onComplete();
+      onComplete({
+        id: userId,
+        fullname,
+        age: age ? parseInt(age) : 0,
+        avatar_url: avatarUrl,
+        color,
+      });
     }
   };
 

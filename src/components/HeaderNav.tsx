@@ -1,4 +1,4 @@
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, CircleUserRound, Menu, X } from "lucide-react";
 import type { Profile } from "../App";
 import React from "react";
 
@@ -46,11 +46,15 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
               Edit Profile
             </button>
             <button onClick={() => setUserMenuIsOpen(!userMenuIsOpen)}>
-              <img
-                src={profile?.avatar_url}
-                alt="Profile Avatar"
-                className="h-10 w-10  rounded-full object-cover border-1 border-blue-500"
-              />
+              {profile?.avatar_url ? (
+                <img
+                  src={profile?.avatar_url}
+                  alt="Profile Avatar"
+                  className="h-10 w-10 rounded-full object-cover border-1 border-blue-500"
+                />
+              ) : (
+                <CircleUserRound className="h-9 w-9 text-blue-500" />
+              )}
               <ChevronDown className="hidden md:block h-4 w-4 absolute right-1.5 lg:right-3 top-6 text-gray-500" />
             </button>
           </div>
