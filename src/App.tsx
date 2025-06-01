@@ -10,7 +10,7 @@ import { SetupProfile } from "./components/SetupProfile";
 
 export interface Profile {
   id: string;
-  fullname: string;
+  full_name: string;
   age: number;
   avatar_url: string;
   color: string;

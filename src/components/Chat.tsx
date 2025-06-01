@@ -69,7 +69,7 @@ export const Chat: React.FC = () => {
   const fetchMessages = async () => {
     const { data, error } = await supabase
       .from("messages")
-      .select("*, profiles(id, fullname, avatar_url, color)")
+      .select("*, profiles(id, full_name, avatar_url, color)")
       .order("inserted_at", { ascending: true });
 
     if (error) {
@@ -129,7 +129,7 @@ export const Chat: React.FC = () => {
                   (profiles?.avatar_url ? (
                     <img
                       src={profiles.avatar_url}
-                      alt={profiles.fullname}
+                      alt={profiles.full_name}
                       className="w-12 h-12 rounded-full border-3 border-gray-200 mr-4 object-cover"
                     />
                   ) : (
@@ -141,7 +141,7 @@ export const Chat: React.FC = () => {
                       className="text-xs mb-1 font-semibold"
                       style={{ color: profiles.color || undefined }}
                     >
-                      {profiles.fullname}
+                      {profiles.full_name}
                     </div>
                   )}
                   <div
@@ -154,7 +154,7 @@ export const Chat: React.FC = () => {
                     {message.content}
                   </div>
                   <div
-                    className={`text-gray-500 text-xs mt-1 ${
+                    className={`text-gray-400 text-xs mt-1 ${
                       isOwn ? "ml-auto" : "mr-auto"
                     }`}
                   >

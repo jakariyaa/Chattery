@@ -46,7 +46,7 @@ This project helped me:
 
 ## Database Schema (Postgres via Supabase)
 
-- **profiles**: Stores user profile info (id, fullname, age, avatar_url, color)
+- **profiles**: Stores user profile info (id, full_name, age, avatar_url, color)
 - **messages**: Stores chat messages (id, user_id, username, content, inserted_at)
 
 Supabase provides instant RESTful and real-time APIs for these tables, which I used to power the app's backend.
@@ -82,7 +82,7 @@ Supabase provides instant RESTful and real-time APIs for these tables, which I u
 -- profiles table
 create table profiles (
   id uuid primary key references auth.users(id),
-  fullname text,
+  full_name text,
   age integer,
   avatar_url text,
   color text

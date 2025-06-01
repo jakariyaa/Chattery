@@ -65,7 +65,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
         <div className="absolute right-2 top-16 z-40 bg-white border border-gray-200 shadow-lg rounded-lg px-6 py-4 space-y-2 flex flex-col items-end animate-fade-in">
           <div className="flex flex-col items-end w-full">
             <span className="font-semibold text-gray-900 text-base truncate max-w-[180px]">
-              {profile?.fullname || "No name"}
+              {profile?.full_name || "No name"}
             </span>
             <span className="text-xs text-gray-500 text-right truncate max-w-[150px]">
               {email}

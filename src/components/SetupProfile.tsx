@@ -17,7 +17,7 @@ export const SetupProfile: React.FC<SetupProfileProps> = ({
   onComplete,
   onCancel,
 }) => {
-  const [fullname, setFullname] = React.useState(profile?.fullname || "");
+  const [fullName, setFullName] = React.useState(profile?.full_name || "");
   const [age, setAge] = React.useState(profile?.age?.toString() || "");
   const [avatarUrl, setAvatarUrl] = React.useState(profile?.avatar_url || "");
   const [color, setColor] = React.useState(profile?.color || "ff8080");
@@ -31,7 +31,7 @@ export const SetupProfile: React.FC<SetupProfileProps> = ({
     const { error } = await supabase.from("profiles").upsert([
       {
         id: userId,
-        fullname,
+        full_name: fullName,
         age: age ? parseInt(age) : null,
         avatar_url: avatarUrl,
         color,
@@ -43,7 +43,7 @@ export const SetupProfile: React.FC<SetupProfileProps> = ({
     } else {
       onComplete({
         id: userId,
-        fullname,
+        full_name: fullName,
         age: age ? parseInt(age) : 0,
         avatar_url: avatarUrl,
         color,
@@ -64,8 +64,8 @@ export const SetupProfile: React.FC<SetupProfileProps> = ({
         <input
           className="border p-2 rounded"
           placeholder="Full Name"
-          value={fullname}
-          onChange={(e) => setFullname(e.target.value)}
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
           required
         />
         <input
