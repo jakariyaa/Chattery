@@ -16,11 +16,19 @@ export interface Profile {
   color: string;
 }
 
+interface Room {
+  id: number;
+  name: string;
+}
+
 const App: React.FC = () => {
   const [session, setSession] = React.useState<Session | null>(null);
   const [profile, setProfile] = React.useState<Profile | null>(null);
   const [profileLoaded, setProfileLoaded] = React.useState(false);
   const [editProfile, setEditProfile] = React.useState(false);
+  const [selectedRoomId, setSelectedRoomId] = React.useState<number>(1);
+  const [rooms, setRooms] = React.useState<Room[]>([]);
+  const [search, setSearch] = React.useState("");
 
   const lastProfileUserId = React.useRef<string | null>(null);
 
@@ -67,6 +75,21 @@ const App: React.FC = () => {
     }
   }, [session, profileLoaded]);
 
+  React.useEffect(() => {
+    const fetchRooms = async () => {
+      const { data, error } = await supabase
+        .from("rooms")
+        .select("id, name")
+        .order("id");
+      if (!error && data) setRooms(data);
+    };
+    fetchRooms();
+  }, []);
+
+  const filteredRooms = rooms.filter((room) =>
+    room.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   if (!session) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -89,16 +112,16 @@ const App: React.FC = () => {
     );
   }
 
-  // if (session && !profileLoaded) {
-  //   return (
-  //     <main className="h-[88vh] md:h-[91.8vh]  flex-1 flex flex-col justify-between relative">
-  //       <div className="flex items-center justify-center flex-1 flex-col space-y-6">
-  //         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-700"></div>
-  //         <p className="text-gray-600 text-center">Loading...</p>
-  //       </div>
-  //     </main>
-  //   );
-  // }
+  if (session && !profileLoaded) {
+    return (
+      <main className="h-[88vh] md:h-[91.8vh]  flex-1 flex flex-col justify-between relative">
+        <div className="flex items-center justify-center flex-1 flex-col space-y-6">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-700"></div>
+          <p className="text-gray-600 text-center">Loading...</p>
+        </div>
+      </main>
+    );
+  }
 
   if (session.user.email === undefined || session.user.email === null) {
     session.user.email = "anonymous@no-mail";
@@ -130,10 +153,21 @@ const App: React.FC = () => {
         }}
         profile={profile}
         editProfile={() => setEditProfile(true)}
+        selectedRoomId={selectedRoomId}
+        setSelectedRoomId={setSelectedRoomId}
+        rooms={filteredRooms}
+        search={search}
+        setSearch={setSearch}
       />
       <div className="flex flex-1">
-        <Sidebar />
-        <Chat />
+        <Sidebar
+          selectedRoomId={selectedRoomId}
+          setSelectedRoomId={setSelectedRoomId}
+          rooms={filteredRooms}
+          search={search}
+          setSearch={setSearch}
+        />
+        <Chat selectedRoomId={selectedRoomId} />
       </div>
     </div>
   );

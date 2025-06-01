@@ -2,11 +2,21 @@ import { ChevronDown, CircleUserRound, Menu, X } from "lucide-react";
 import type { Profile } from "../App";
 import React from "react";
 
+interface Room {
+  id: number;
+  name: string;
+}
+
 interface HeaderNavProps {
   email: string;
   profile: Profile | null;
   signOut: () => void;
   editProfile: () => void;
+  selectedRoomId?: number | null;
+  setSelectedRoomId?: (id: number) => void;
+  rooms: Room[];
+  search: string;
+  setSearch: (s: string) => void;
 }
 
 export const HeaderNav: React.FC<HeaderNavProps> = ({
@@ -14,9 +24,18 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   profile,
   signOut,
   editProfile,
+  selectedRoomId,
+  setSelectedRoomId,
+  rooms,
+  search,
+  setSearch,
 }) => {
   const [menuIsOpen, setMenuIsOpen] = React.useState(false);
   const [userMenuIsOpen, setUserMenuIsOpen] = React.useState(false);
+
+  const filteredRooms = rooms.filter((room) =>
+    room.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="relative">
@@ -101,32 +120,40 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
             type="text"
             placeholder="Search..."
             className="mb-4 px-4 py-2 rounded bg-gray-100 focus:outline-none w-full"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
           <div className="flex-1 space-y-3 overflow-y-auto">
-            {[
-              { id: 1, name: "Room 1", active: true },
-              { id: 2, name: "Room 2", active: false },
-              { id: 3, name: "Room 3", active: false },
-            ].map((chat) => (
+            {filteredRooms.map((room) => (
               <div
-                key={chat.id}
+                key={room.id}
                 className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                  chat.active ? "bg-blue-100" : "hover:bg-gray-100"
+                  selectedRoomId === room.id
+                    ? "bg-blue-100"
+                    : "hover:bg-gray-100"
                 }`}
+                onClick={() => {
+                  setMenuIsOpen(false);
+                  if (setSelectedRoomId) setSelectedRoomId(room.id);
+                }}
               >
                 <div>
                   <Menu
                     className={`w-8 h-8 ${
-                      chat.active ? "text-blue-500" : "text-gray-300"
+                      selectedRoomId === room.id
+                        ? "text-blue-500"
+                        : "text-gray-300"
                     }`}
                   />
                 </div>
                 <span
                   className={`font-medium ${
-                    chat.active ? "text-blue-700" : "text-gray-700"
+                    selectedRoomId === room.id
+                      ? "text-blue-700"
+                      : "text-gray-700"
                   }`}
                 >
-                  {chat.name}
+                  {room.name}
                 </span>
               </div>
             ))}

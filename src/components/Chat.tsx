@@ -1,7 +1,7 @@
 import React from "react";
 import { supabase } from "../supabaseClient";
 import { SendHorizontal, UserRound } from "lucide-react";
-import { formatLocalTime } from "../utils/TimeFormatter";
+import { formatRelativeTime } from "../utils/TimeFormatter";
 import type { Profile } from "../App";
 
 interface MessageWithProfile {
@@ -10,13 +10,17 @@ interface MessageWithProfile {
   username: string;
   content: string;
   inserted_at: string;
+  room_id: number;
   profiles: Profile | null;
 }
 
-export const Chat: React.FC = () => {
+interface ChatProps {
+  selectedRoomId: number | null;
+}
+
+export const Chat: React.FC<ChatProps> = ({ selectedRoomId }) => {
   const [messages, setMessages] = React.useState<MessageWithProfile[]>([]);
   const [newMessage, setNewMessage] = React.useState("");
-  const [username, setUsername] = React.useState("");
   const [userId, setUserId] = React.useState("");
   const [loading, setLoading] = React.useState(true);
 
@@ -33,7 +37,6 @@ export const Chat: React.FC = () => {
       }
       if (session?.user) {
         setUserId(session.user.id);
-        setUsername(session.user.email || "Anonymous");
       }
     };
 
@@ -41,23 +44,43 @@ export const Chat: React.FC = () => {
   }, []);
 
   React.useEffect(() => {
+    const fetchMessages = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("messages")
+        .select("*, profiles(id, full_name, avatar_url, color)")
+        .eq("room_id", selectedRoomId)
+        .order("inserted_at", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching messages:", error);
+      } else {
+        setMessages(data as MessageWithProfile[]);
+        setLoading(false);
+      }
+    };
+
     fetchMessages();
 
     const subscription = supabase
       .channel("public:messages")
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages" },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `room_id=eq.${selectedRoomId}`,
+        },
         () => {
           fetchMessages();
         }
       )
       .subscribe();
-
     return () => {
       supabase.removeChannel(subscription);
     };
-  }, []);
+  }, [selectedRoomId]);
 
   React.useEffect(() => {
     const messagesContainer = document.getElementById("messages-container");
@@ -66,33 +89,17 @@ export const Chat: React.FC = () => {
     }
   }, [messages]);
 
-  const fetchMessages = async () => {
-    const { data, error } = await supabase
-      .from("messages")
-      .select("*, profiles(id, full_name, avatar_url, color)")
-      .order("inserted_at", { ascending: true });
-
-    if (error) {
-      console.error("Error fetching messages:", error);
-    } else {
-      setMessages(data as MessageWithProfile[]);
-      setLoading(false);
-    }
-  };
-
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    if (!selectedRoomId) return;
     if (newMessage.trim() === "") return;
-
     const { error } = await supabase.from("messages").insert([
       {
         user_id: userId,
-        username: username.split("@")[0],
         content: newMessage.trim(),
+        room_id: selectedRoomId,
       },
     ]);
-
     if (error) {
       console.error("Error sending message:", error.message);
     } else {
@@ -158,7 +165,7 @@ export const Chat: React.FC = () => {
                       isOwn ? "ml-auto" : "mr-auto"
                     }`}
                   >
-                    {formatLocalTime(message.inserted_at)}
+                    {formatRelativeTime(message.inserted_at)}
                   </div>
                 </div>
               </div>
