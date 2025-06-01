@@ -3,6 +3,7 @@ import { supabase } from "../supabaseClient";
 import { SendHorizontal, UserRound } from "lucide-react";
 import { formatRelativeTime } from "../utils/TimeFormatter";
 import type { Profile } from "../App";
+import ReactMarkdown from "react-markdown";
 
 interface MessageWithProfile {
   id: number;
@@ -23,6 +24,7 @@ export const Chat: React.FC<ChatProps> = ({ selectedRoomId }) => {
   const [newMessage, setNewMessage] = React.useState("");
   const [userId, setUserId] = React.useState("");
   const [loading, setLoading] = React.useState(true);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -107,6 +109,19 @@ export const Chat: React.FC<ChatProps> = ({ selectedRoomId }) => {
     }
   };
 
+  const handleTextareaKeyDown = (
+    e: React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
+    if (!e.shiftKey && e.key === "Enter") {
+      e.preventDefault();
+      const form = e.currentTarget.form;
+      if (form) {
+        const event = new Event("submit", { bubbles: true, cancelable: true });
+        form.dispatchEvent(event);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <main className="h-[88vh] md:h-[91.8vh]  flex-1 flex flex-col justify-between relative">
@@ -158,7 +173,7 @@ export const Chat: React.FC<ChatProps> = ({ selectedRoomId }) => {
                         : "bg-gray-100 text-gray-900 mr-10"
                     }`}
                   >
-                    {message.content}
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
                   </div>
                   <div
                     className={`text-gray-400 text-xs mt-1 ${
@@ -177,12 +192,15 @@ export const Chat: React.FC<ChatProps> = ({ selectedRoomId }) => {
         onSubmit={handleSendMessage}
         className="w-full flex items-center bg-white p-6 border-t border-gray-200"
       >
-        <input
-          type="text"
+        <textarea
+          ref={textareaRef}
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-1 border border-gray-200 rounded-full px-4 py-3 mr-4 focus:outline-none bg-gray-50"
+          onKeyDown={handleTextareaKeyDown}
+          placeholder="Type a message... (Markdown supported)"
+          rows={1}
+          className="flex-1 border border-gray-200 rounded-xl px-4 py-3 mr-4 focus:outline-none bg-gray-50 resize-none min-h-[48px] max-h-40"
+          style={{ lineHeight: "1.5", overflow: "auto" }}
         />
         <button
           type="submit"

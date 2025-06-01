@@ -1,21 +1,3 @@
-export function formatLocalTime(
-  isoTimestamp: string,
-  options?: Intl.DateTimeFormatOptions
-): string {
-  const date = new Date(isoTimestamp);
-  const defaultOptions: Intl.DateTimeFormatOptions = {
-    hour: "numeric",
-    minute: "2-digit",
-  };
-  return date.toLocaleTimeString(undefined, { ...defaultOptions, ...options });
-}
-
-export function formatLocalDateTime(isoTimestamp: string): string {
-  const date = new Date(isoTimestamp);
-  return date.toLocaleString();
-}
-
-// create a function to compare from current time to the timestamp: e.g. 5 minutes ago, 1 hour ago, 1 day ago
 export function formatRelativeTime(isoTimestamp: string): string {
   const date = new Date(isoTimestamp);
   const now = new Date();
