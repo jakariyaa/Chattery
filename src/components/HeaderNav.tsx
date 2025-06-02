@@ -1,6 +1,7 @@
-import { ChevronDown, CircleUserRound, Menu, X } from "lucide-react";
+import { ChevronDown, CircleUserRound, Menu } from "lucide-react";
 import type { Profile } from "../App";
 import React from "react";
+import { RoomListNav } from "./RoomListNav";
 
 interface Room {
   id: number;
@@ -32,10 +33,6 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
 }) => {
   const [menuIsOpen, setMenuIsOpen] = React.useState(false);
   const [userMenuIsOpen, setUserMenuIsOpen] = React.useState(false);
-
-  const filteredRooms = rooms.filter((room) =>
-    room.name.toLowerCase().includes(search.toLowerCase())
-  );
 
   return (
     <div className="relative">
@@ -108,58 +105,17 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
         </div>
       )}
 
-      {menuIsOpen && (
-        <aside className="fixed top-0 left-0 w-72 max-w-full bg-white border-r border-gray-200 flex flex-col p-6 h-screen shadow-xl animate-slide-in-left z-40">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Rooms</h2>
-            <button onClick={() => setMenuIsOpen(false)}>
-              <X className="text-gray-600 cursor-pointer" />
-            </button>
-          </div>
-          <input
-            type="text"
-            placeholder="Search..."
-            className="mb-4 px-4 py-2 rounded bg-gray-100 focus:outline-none w-full"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <div className="flex-1 space-y-3 overflow-y-auto">
-            {filteredRooms.map((room) => (
-              <div
-                key={room.id}
-                className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                  selectedRoomId === room.id
-                    ? "bg-blue-100"
-                    : "hover:bg-gray-100"
-                }`}
-                onClick={() => {
-                  setMenuIsOpen(false);
-                  if (setSelectedRoomId) setSelectedRoomId(room.id);
-                }}
-              >
-                <div>
-                  <Menu
-                    className={`w-8 h-8 ${
-                      selectedRoomId === room.id
-                        ? "text-blue-500"
-                        : "text-gray-300"
-                    }`}
-                  />
-                </div>
-                <span
-                  className={`font-medium ${
-                    selectedRoomId === room.id
-                      ? "text-blue-700"
-                      : "text-gray-700"
-                  }`}
-                >
-                  {room.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        </aside>
-      )}
+      {/* Mobile Drawer for Rooms */}
+      <RoomListNav
+        mode="drawer"
+        isOpen={menuIsOpen}
+        onClose={() => setMenuIsOpen(false)}
+        selectedRoomId={selectedRoomId ?? null}
+        setSelectedRoomId={setSelectedRoomId ?? (() => {})}
+        rooms={rooms}
+        search={search}
+        setSearch={setSearch}
+      />
     </div>
   );
 };

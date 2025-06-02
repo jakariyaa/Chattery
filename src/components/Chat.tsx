@@ -124,7 +124,7 @@ export const Chat: React.FC<ChatProps> = ({ selectedRoomId }) => {
 
   if (loading) {
     return (
-      <main className="h-[88vh] md:h-[91.8vh]  flex-1 flex flex-col justify-between relative">
+      <main className="h-[100vh] md:h-[91.8vh]  flex-1 flex flex-col justify-between relative">
         <div className="flex items-center justify-center flex-1 flex-col space-y-6">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-700"></div>
           <p className="text-gray-600 text-center">Loading...</p>
@@ -134,7 +134,7 @@ export const Chat: React.FC<ChatProps> = ({ selectedRoomId }) => {
   }
 
   return (
-    <main className="h-[88vh] md:h-[91.8vh]  flex-1 flex flex-col justify-between relative">
+    <main className="h-[89vh] md:h-[91.8vh]  flex-1 flex flex-col justify-between relative">
       <div id="messages-container" className="flex-1 overflow-y-auto p-4">
         <div className="flex flex-col space-y-4">
           {messages.map((message) => {
@@ -152,7 +152,8 @@ export const Chat: React.FC<ChatProps> = ({ selectedRoomId }) => {
                     <img
                       src={profiles.avatar_url}
                       alt={profiles.full_name}
-                      className="w-12 h-12 rounded-full border-3 border-gray-200 mr-4 object-cover"
+                      className="w-12 h-12 rounded-full border-1 mr-4 object-cover"
+                      style={{ borderColor: profiles.color || "#d1d5dc" }}
                     />
                   ) : (
                     <UserRound className="w-12 h-12 text-gray-400 mr-4 border-2 border-gray-200 rounded-full" />
@@ -167,7 +168,7 @@ export const Chat: React.FC<ChatProps> = ({ selectedRoomId }) => {
                     </div>
                   )}
                   <div
-                    className={`rounded-xl px-4 py-2 max-w-xs break-words shadow-sm text-sm font-medium ${
+                    className={`rounded-xl px-4 py-2 max-w-md break-words shadow-sm text-sm font-medium ${
                       isOwn
                         ? "bg-blue-500 text-white ml-10"
                         : "bg-gray-100 text-gray-900 mr-10"
@@ -190,21 +191,21 @@ export const Chat: React.FC<ChatProps> = ({ selectedRoomId }) => {
       </div>
       <form
         onSubmit={handleSendMessage}
-        className="w-full flex items-center bg-white p-6 border-t border-gray-200"
+        className="w-full flex items-center bg-white p-3 md:p-6 border-t border-gray-200"
       >
         <textarea
           ref={textareaRef}
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={handleTextareaKeyDown}
-          placeholder="Type a message... (Markdown supported)"
+          placeholder="Message..."
           rows={1}
           className="flex-1 border border-gray-200 rounded-xl px-4 py-3 mr-4 focus:outline-none bg-gray-50 resize-none min-h-[48px] max-h-40"
           style={{ lineHeight: "1.5", overflow: "auto" }}
         />
         <button
           type="submit"
-          className="border-1 border-blue-500 hover:text-white hover:bg-blue-600 text-blue-500 rounded-full p-3 flex items-center justify-center shadow-md"
+          className="border-1 border-blue-500 hover:text-white hover:bg-blue-600 text-blue-500 rounded-xl p-3 flex items-center justify-center shadow-md"
         >
           <SendHorizontal />
         </button>

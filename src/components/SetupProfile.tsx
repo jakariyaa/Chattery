@@ -44,7 +44,7 @@ export const SetupProfile: React.FC<SetupProfileProps> = ({
       onComplete({
         id: userId,
         full_name: fullName,
-        age: age ? parseInt(age) : 0,
+        age: age ? parseInt(age) : 13,
         avatar_url: avatarUrl,
         color,
       });
@@ -72,6 +72,7 @@ export const SetupProfile: React.FC<SetupProfileProps> = ({
           className="border p-2 rounded"
           placeholder="Age"
           type="number"
+          min="1"
           value={age}
           onChange={(e) => setAge(e.target.value)}
         />
