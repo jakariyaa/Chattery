@@ -47,7 +47,6 @@ export const Chat: React.FC<ChatProps> = ({ selectedRoomId }) => {
 
   React.useEffect(() => {
     const fetchMessages = async () => {
-      setLoading(true);
       const { data, error } = await supabase
         .from("messages")
         .select("*, profiles(id, full_name, avatar_url, color)")

@@ -1,7 +1,7 @@
 export function formatRelativeTime(isoTimestamp: string): string {
   const date = new Date(isoTimestamp);
   const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const diffInSeconds = Math.ceil((now.getTime() - date.getTime()) / 1000);
 
   if (diffInSeconds < 60) {
     return `${diffInSeconds} seconds ago`;
